@@ -50,7 +50,7 @@ This means two things:
 1) You don't have to compute the complete data set again if the hoj computation ( step 2 in the chain ) fails at some point. 
 	You have the temporary parts still in the tmp_parts folder. 
 
-2) We need at least a minimal amount of memory for the procedure.
+2) We need at least a minimum amount of memory for the procedure.
 	First of all, it's possible to compute the full chain with 8 Gb of Ram, but we don't recommend it.
 	If this will be successful depends strongly on the systems memory handling strategy and on the task(s) you will do besides the dataset computation. 
 	( Coffee would be a good idea because coffee is always a good idea. )
