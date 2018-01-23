@@ -3,7 +3,7 @@ The complete refactored hoj generation tool for the pyNTURGB-D dataset by Sharou
 
 First of all the known bugs:
 
-# # # Data # # # 
+# Occlusions # 
 
 We can't compute data frames where body parts are missing ( occlusion ).
 This is a real problem. But the problem is in the dataset not in the data transformation tool.
@@ -24,7 +24,7 @@ We have implemented both strategies.
 But the basic problems still exists. 
 We can't deal with occluded body parts ( what means, we can't process data where an arm is missing or something similar. ).	
 
-#### Main Memory Dependencies ####
+# Main Memory Dependencies #
 
 There are ~56600 sets a ~100 frames in the dataset and we can't store them all in the memory during the computation.
 Therefor, we will devide the dataset in 4 temporary parts ( stored in tmp_data/ ) during the first step of the hoj computation ( read from the original files ). 
