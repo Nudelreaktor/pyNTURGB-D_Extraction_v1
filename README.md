@@ -58,5 +58,5 @@ This means two things:
 	We recommend: 
   
 		-> Minimum:      8 Gb ( If you need just parts of the full set or you have a lot of time. Approx: 4 hours for the full set. )
-		-> Sufficient:  12 Gb ( Yep, it works and i can play minesweeper. )
-		-> Recommended: 16 Gb ( For full performance. Testcase: Some rounds PUBG + hoj_gen full set computation. )
+		-> Sufficient:  12 Gb ( Yep, it works and i can play minesweeper. Up to 2 hours for the full set. )
+		-> Recommended: 16 Gb ( For full performance ( 1.5 hours ). Testcase: Some rounds PUBG + hoj_gen full set computation. )
