@@ -1,7 +1,9 @@
 # pyNTU_hoj_gen_v1
-The complete refactored hoj generation tool for the pyNTURGB-D dataset by Sharoudy et.al.
 
-First of all the known bugs:
+We refactored the hoj_gen data extraction tool for the Rose Lab NTURGB-D dataset by Sharoudy et.al. in the last few weeks.
+And we've changed a lot.
+You should read the description below to get informed about all changes.
+And to start the inforamtion tour properly we will begin with the known bugs and memory recomendations.
 
 # Occlusions # 
 
@@ -24,7 +26,7 @@ We have implemented both strategies.
 But the basic problems still exists. 
 We can't deal with occluded body parts ( what means, we can't process data where an arm is missing or something similar. ).	
 
-# Main Memory Dependencies #
+# Main Memory Recommendations #
 
 There are ~56600 sets a ~100 frames in the dataset and we can't store them all in the memory during the computation.
 Therefor, we will devide the dataset in 4 temporary parts ( stored in tmp_data/ ) during the first step of the hoj computation ( read from the original files ). 
