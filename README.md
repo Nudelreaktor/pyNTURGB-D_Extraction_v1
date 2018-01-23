@@ -52,8 +52,7 @@ This means two things:
 
 2) We need at least a minimum amount of memory for the procedure.
 	First of all, it's possible to compute the full chain with 8 Gb of Ram, but we don't recommend it.
-	If this will be successful depends strongly on the systems memory handling strategy and on the task(s) you will do besides the dataset computation. 
-	( Coffee would be a good idea because coffee is always a good idea. )
+	It depends strongly on the systems memory handling strategy and on the task(s) you will do besides the dataset computation if this will be successful . ( Coffee would be a good idea because coffee is always a good idea. )
 	To prevent some lost hours of computation time without a sufficient result we've defined minimal specifications.
 
 	We recommend: 
