@@ -1,6 +1,6 @@
 # pyNTU_hoj_gen_v1
 
-We refactored the hoj_gen data extraction tool for the Rose Lab NTURGB-D dataset by Sharoudy et.al. ( https://github.com/shahroudy/NTURGB-D ) in the last few weeks.
+We've refactored the hoj_gen data extraction tool for the Rose Lab NTURGB-D dataset by Sharoudy et.al. ( https://github.com/shahroudy/NTURGB-D ) in the last few weeks.
 And we've changed a lot.
 You should read the description below to get informed about all changes.
 And to start the information tour properly we will begin with the requirements followed by the known bugs and memory recomendations.
