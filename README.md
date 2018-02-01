@@ -1,11 +1,10 @@
 # pyNTU_hoj_gen_v1
 
 We've refactored the hoj_gen data extraction tool for the Rose Lab NTURGB-D dataset by Sharoudy et.al. ( https://github.com/shahroudy/NTURGB-D ) in the last few weeks.
-And we've changed a lot.
-You should read the description below to get informed about all changes.
-And to start the information tour properly we will begin with the requirements followed by the known bugs and memory recommendations.
+You should read the description below to get informed about changes.
+We will begin with the requirements followed by the known bugs and memory recommendations.
 
-# Requirments #
+# Requirements #
 
 -> Install a python ( >= 2.7 )
 
@@ -17,7 +16,7 @@ And to start the information tour properly we will begin with the requirements f
 
 -> Clone/Download this repository
 
-# Occlusions # 
+# Known:Bugs :: Occlusions # 
 
 We can't compute data frames where body parts are missing ( occlusion ).
 This is a real problem. But the problem is in the dataset not in the data transformation tool.
@@ -60,3 +59,4 @@ This means two things:
 		-> Minimum:      8 Gb ( If you need just parts of the full set or you have a lot of time. Approx: 4 hours for the full set. )
 		-> Sufficient:  12 Gb ( Yep, it works and i can play minesweeper. Up to 2 hours for the full set. )
 		-> Recommended: 16 Gb ( For full performance ( 1.5 hours ). Testcase: Some rounds PUBG + hoj_gen full set computation. )
+
