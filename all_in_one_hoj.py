@@ -81,7 +81,7 @@ def get_joint_coordinates(list_of_joints, reference_join, reference_join_up, ref
 ##		compute the HoJ3D
 ##
 #########################################################################################
-def compute_hoj3d( list_of_joints, reference_join, reference_join_up, reference_join_left, reference_join_right, joint_indexes = [], use_triangle_function = False, n_time = 0.0, depth_measurement = None, _body_parts = False):
+def compute_hoj3d( list_of_joints, reference_join, reference_join_up, reference_join_left, reference_join_right, joint_indexes = [], use_triangle_function = False, n_time = 0.0, _depth_measurement = None, _body_parts = False):
 
 	t0 = time.time()
 
@@ -92,7 +92,7 @@ def compute_hoj3d( list_of_joints, reference_join, reference_join_up, reference_
 
 	# the historamm of joints 3D
 	hoj3d = np.zeros((7,12))
-	if depth_measurement is not None:
+	if _depth_measurement is not None:
 		hoj3d = np.zeros((7,24))
 
 	# get joints to compute
@@ -110,7 +110,7 @@ def compute_hoj3d( list_of_joints, reference_join, reference_join_up, reference_
 		
 	# assign hoj add function
 	hoj_add_function = add_to_hoj_without_depth
-	if depth_measurement is not None:
+	if _depth_measurement is not None:
 		hoj_add_function = add_to_hoj_with_depth
 
 	# calculate bodyparts
@@ -158,7 +158,7 @@ def compute_hoj3d( list_of_joints, reference_join, reference_join_up, reference_
 				return [],-1
 
 		considered_radius = flat_r
-		if depth_measurement is not "cylinder":
+		if _depth_measurement is not "cylinder":
 			considered_radius = r
 		
 		inner, outer = r_function(considered_radius, cut_radius)
@@ -212,6 +212,9 @@ def compute_hoj3d( list_of_joints, reference_join, reference_join_up, reference_
 	# add bodyparts
 	if _body_parts:
 		hoj3d = np.append(hoj3d.flatten(),[left_hand_sholder, right_hand_sholder, left_foot_hip, right_foot_hip])
+	
+	# Flat the data. Always.
+	hoj3d = hoj3d.flatten()
 
 	t1 = time.time()
 	n_time += t1 - t0
