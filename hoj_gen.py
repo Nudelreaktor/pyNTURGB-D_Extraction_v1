@@ -49,7 +49,7 @@ def main():
 	clpDict = parseOpts( sys.argv )
 
 	# Set the descriptor width depending on the chosen transformation.
-	_number_of_bins_ = 0
+	_number_of_bins = 0
 	if( clpDict['_hoj'] is True ):
 		_transformation_type = '_hoj'
 		# Standard hoj descriptor width.
@@ -64,6 +64,9 @@ def main():
 		_transformation_type = '_ddd_points'
 		# Set the desciptor width to the number of used joints multiplied by 3 ( the number of world coordinates )
 		_number_of_bins = 3 * len(clpDict['_joint_index_list'])
+	else:
+		# If you just want to subsample the dataset by action or camera or stuff		
+		_number_of_bins = 0
 
 	print( _number_of_bins )
 
@@ -112,9 +115,10 @@ def main():
 
 			print("\n\nHojG_Main :: Start loading part #"+str(i+1)+" of 4.")
 
-			print("LB: ",_low_dir_list_border)
-			print("UB: ",_upper_dir_list_border)
-			print("Round: ", i)
+			if( clpDict['_verbose'] ):
+				print("LB: ",_low_dir_list_border)
+				print("UB: ",_upper_dir_list_border)
+				print("Round: ", i)
 
 			if( i < 3 ):
 				_parted_dir_list = _dir_list[int(_low_dir_list_border) : int(_upper_dir_list_border)]
@@ -175,78 +179,80 @@ def main():
 		print("HojG_Main :: Step 1 - Loading data is now finished.")
 		print("----------------------------------------------------------------------------------------------------------------------------")
 
-		print("\n\nHojG_Main :: Start loading previously binarized data objects.")
-
 	_data_pickel = []
 
 	# Update the feedback structure for the whole datset.
 	big_feedback['_data_part_all'] = 0
 
-	for i in range(0,4):
+	if( clpDict['_compute_descriptor'] is True ):
 
-		print("\n\nHojG_Main :: Load binarized data object "+str(i+1)+" of 4.")	
-		print("----------------------------------------------------------------------------------------------------------------------------")
+		print("\n\nHojG_Main :: Start loading previously binarized data objects.")
 
-		if( clpDict['_byte_object'] is True and clpDict['_byte_object_path'] is not 'tmp_data/'):
-			_part_name = clpDict['_byte_object_path']+"data_part_"+str(i)+".bin_data_tmp"
-			_data_part = load_pickles( _part_name, "data" )
-			_part_name = clpDict['_byte_object_path']+"name_part_"+str(i)+".bin_data_tmp"
-			_name_part = load_pickles( _part_name, "name" )
-		else:
-			_part_name = "tmp_data/data_part_"+str(i)+".bin_data_tmp"
-			_data_part = load_pickles( _part_name, "data" )
-			_part_name = "tmp_data/name_part_"+str(i)+".bin_data_tmp"
-			_name_part = load_pickles( _part_name, "name" )
+		for i in range(0,4):
 
-		# Compute the hoj descriptor from the data part.
-		_data_container, _occlusion_name_list, _nan_name_list, feedback = compute_hoj_using_the_data_parts(\
-			_data_part,\
-			_name_part,\
-			_hoj_transformation,\
-			_transformation_type,\
-			clpDict['_joint_index_list'],\
-			_number_of_bins,\
-			clpDict['_error_handling_strategy'],\
-			#TODO .... die klassen als command line argument.
-			61,\
-			clpDict['_verbose'],\
-			clpDict['_depth_measurement'],\
-			clpDict['_body_parts'],\
-			clpDict['_loCoords'])
+			print("\n\nHojG_Main :: Load binarized data object "+str(i+1)+" of 4.")	
+			print("----------------------------------------------------------------------------------------------------------------------------")
 
-		# Give free all the memory for the h. 
-		data_part = None
-		name_part = None
+			if( clpDict['_byte_object'] is True and clpDict['_byte_object_path'] is not 'tmp_data/'):
+				_part_name = clpDict['_byte_object_path']+"data_part_"+str(i)+".bin_data_tmp"
+				_data_part = load_pickles( _part_name, "data" )
+				_part_name = clpDict['_byte_object_path']+"name_part_"+str(i)+".bin_data_tmp"
+				_name_part = load_pickles( _part_name, "name" )
+			else:
+				_part_name = "tmp_data/data_part_"+str(i)+".bin_data_tmp"
+				_data_part = load_pickles( _part_name, "data" )
+				_part_name = "tmp_data/name_part_"+str(i)+".bin_data_tmp"
+				_name_part = load_pickles( _part_name, "name" )
 
-		# Give feedback of the computation from this data part. 
-		_data_part_sets = feedback['_data_part_sets']
-		_processed_sets = feedback['_processed_sets']
-		_data_part_frames = feedback['_data_part_frames']
-		_processed_frames = feedback['_processed_frames']
-		_number_of_divZero_error = feedback['_number_of_divZero_error']
-		_number_of_oCC_error = feedback['_number_of_oCC_error']
-		if( clpDict['_error_handling_strategy'] is 'skip_set' ):
-			print('\n\r')
-			print("CDP :: %d sets of %d sets in total have been transformed." %(_processed_sets, _data_part_sets ) )
-			print("CDP :: %d sets skipped in this part." %( _data_part_sets-_processed_sets ) )
-		elif( clpDict['_error_handling_strategy'] is 'skip_frame' ):
-			print('\n\r')
-			print("CDP :: %d sets of %d sets in total have been transformed." %(_processed_sets, _data_part_sets ) )
-			print("CDP :: %d frames of %d frames in total have been transformed." %(_processed_frames, _data_part_frames ) )
-			print("CDP :: %d frames skipped in this part." %( _data_part_frames-_processed_frames ) )
+			# Compute the hoj descriptor from the data part.
+			_data_container, _occlusion_name_list, _nan_name_list, feedback = compute_hoj_using_the_data_parts(\
+				_data_part,\
+				_name_part,\
+				_hoj_transformation,\
+				_transformation_type,\
+				clpDict['_joint_index_list'],\
+				_number_of_bins,\
+				clpDict['_error_handling_strategy'],\
+				#TODO .... die klassen als command line argument.
+				61,\
+				clpDict['_verbose'],\
+				clpDict['_depth_measurement'],\
+				clpDict['_body_parts'],\
+				clpDict['_loCoords'])
 
-		# Concatenate the data parts together in one list.
-		_data_pickel.extend(_data_container[:])
+			# Give free all the memory for the h. 
+			data_part = None
+			name_part = None
 
-		# Update the feedback structure for the whole data set.
-		big_feedback['_data_part_all'] = big_feedback['_data_part_all'] + _data_part_sets
-		big_feedback['_processed_sets_all'] = big_feedback['_processed_sets_all'] + _processed_sets
-		big_feedback['_data_part_frames_all'] = big_feedback['_data_part_frames_all'] + _data_part_frames
-		big_feedback['_processed_frames_all'] = big_feedback['_processed_frames_all'] + _processed_frames
-		big_feedback['_number_of_divZero_error_all'] = big_feedback['_number_of_divZero_error_all'] + _number_of_divZero_error
-		big_feedback['_number_of_oCC_error_all'] = big_feedback['_number_of_oCC_error_all'] + _number_of_oCC_error
+			# Give feedback of the computation from this data part. 
+			_data_part_sets = feedback['_data_part_sets']
+			_processed_sets = feedback['_processed_sets']
+			_data_part_frames = feedback['_data_part_frames']
+			_processed_frames = feedback['_processed_frames']
+			_number_of_divZero_error = feedback['_number_of_divZero_error']
+			_number_of_oCC_error = feedback['_number_of_oCC_error']
+			if( clpDict['_error_handling_strategy'] is 'skip_set' ):
+				print('\n\r')
+				print("CDP :: %d sets of %d sets in total have been transformed." %(_processed_sets, _data_part_sets ) )
+				print("CDP :: %d sets skipped in this part." %( _data_part_sets-_processed_sets ) )
+			elif( clpDict['_error_handling_strategy'] is 'skip_frame' ):
+				print('\n\r')
+				print("CDP :: %d sets of %d sets in total have been transformed." %(_processed_sets, _data_part_sets ) )
+				print("CDP :: %d frames of %d frames in total have been transformed." %(_processed_frames, _data_part_frames ) )
+				print("CDP :: %d frames skipped in this part." %( _data_part_frames-_processed_frames ) )
 
-	store_pickles(_data_pickel, "data", 'final', 0)
+			# Concatenate the data parts together in one list.
+			_data_pickel.extend(_data_container[:])
+
+			# Update the feedback structure for the whole data set.
+			big_feedback['_data_part_all'] = big_feedback['_data_part_all'] + _data_part_sets
+			big_feedback['_processed_sets_all'] = big_feedback['_processed_sets_all'] + _processed_sets
+			big_feedback['_data_part_frames_all'] = big_feedback['_data_part_frames_all'] + _data_part_frames
+			big_feedback['_processed_frames_all'] = big_feedback['_processed_frames_all'] + _processed_frames
+			big_feedback['_number_of_divZero_error_all'] = big_feedback['_number_of_divZero_error_all'] + _number_of_divZero_error
+			big_feedback['_number_of_oCC_error_all'] = big_feedback['_number_of_oCC_error_all'] + _number_of_oCC_error
+
+		store_pickles(_data_pickel, clpDict["_byte_object_name"], 'final', 0)
 
 	comp_end_time = tM.clock()
 	timeDiff = (dT.timedelta(seconds=comp_end_time - comp_start_time)).total_seconds()
@@ -669,11 +675,15 @@ def read_in_internal_data_storage( _path_name, _dir_list, _list_of_missed_skelet
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # A small function to skip actions which are not in the action list
-def is_action( _action_list_, _skeleton_filename_ ):
+def is_action( _action_list_, _skeleton_filename ):
 	# If an action_list is given 
+	
+	just_the_setname = _skeleton_filename.split('.')[0].split('/')[-1]
+	
 	if( _action_list_ is not None ):
 		for key in _action_list_:
-			if( key in _skeleton_filename_ ):
+			if( key in just_the_setname ):
+				print( just_the_setname )
 				# If the action of the skeleton file is in the action list.
 				return True
 	# If no action list is given
@@ -761,6 +771,7 @@ def parseOpts( argv ):
 	_path_name = ""
 	_byte_object = False
 	_byte_object_path = ""
+	_byte_object_name = "data"
 	_dataset_name = ""
 	_skeleton_name = None
 	_action_list = []
@@ -772,7 +783,8 @@ def parseOpts( argv ):
 	_number_of_subframes = 8	
 	_sample_strategy = "first"
 	_error_handling_strategy = "skip_set"
-	_hoj = True
+	_compute_descriptor = False
+	_hoj = False
 	_ddd_points = False
 	_loCoords = False  
 	_depth_measurement = None
@@ -787,6 +799,7 @@ def parseOpts( argv ):
 		'_path_name':_path_name,\
 		'_byte_object':_byte_object,\
 		'_byte_object_path':_byte_object_path,\
+		'_byte_object_name':_byte_object_name,\
 		'_skeleton_name':_skeleton_name,\
 		'_action_list':_action_list,\
 		'_ignore_tail':_ignore_tail,\
@@ -797,7 +810,8 @@ def parseOpts( argv ):
 		'_sample_strategy':_sample_strategy,\
 		'_error_handling_strategy':_error_handling_strategy,\
 		'_remove_tmp_data_objects':_remove_tmp_data_objects,\
-		'_hjo':_hoj,\
+		'_compute_descriptor':_compute_descriptor,\
+		'_hoj':_hoj,\
 		'_ddd_points':_ddd_points,\
 		'_loCoords':_loCoords,\
 		'_depth_measurement':_depth_measurement,\
@@ -812,6 +826,7 @@ def parseOpts( argv ):
 	parser.add_argument('-path', '--path_name', action='store', dest='_path_name', help='The path to the dataset.')
 	parser.add_argument('-bo','--byte_object', action='store_true', dest='_byte_object', help='If you want to read data from a previously computed byte object.')
 	parser.add_argument('-bop','--byte_object_path', action='store', dest='_byte_object_path', help='The path to the byte_object.')
+	parser.add_argument('-bon','--byte_object_name', action='store', dest='_byte_object_name', help='The name of the final byte object after extraction and the final descriptor computation.')
 
 	# Dataset Shape Control 
 	parser.add_argument('-pn', '--part_name', action='store', dest='_skeleton_name', help='The name of the dataset in the path.')
@@ -858,6 +873,10 @@ def parseOpts( argv ):
 			clpDict['_byte_object_path'] = args._byte_object_path
 		else:
 			clpDict['_byte_object_path'] = "tmp_data/"
+
+	# The name of the final byte object after extraction and descriptor computation.
+	if( args._byte_object_name ):
+		clpDict['_byte_object_name'] = args._byte_object_name
 
 	# If a dataset name is given ( the list of datasets to compute then starts at this position )
 	if( args._skeleton_name ):
@@ -926,6 +945,7 @@ def parseOpts( argv ):
 
 	# Will u use hoj format as output or 3d points?
 	if( args._hoj is True ):
+		clpDict['_compute_descriptor'] = True
 		clpDict['_hoj'] = True
 
 		if( args._depth_measurement is not None ):
@@ -936,16 +956,11 @@ def parseOpts( argv ):
 
 		clpDict['_ddd_points'] = False
 	elif( args._ddd_points is True ):
+		clpDict['_compute_descriptor'] = True
 		clpDict['_hoj'] = False
 		clpDict['_ddd_points'] = True
 		if( args._loCoords ):
 			clpDict['_loCoords'] = True
-	else:
-		clpDict['_hoj'] = True
-		clpDict['_depth_measurment'] = None
-		clpDict['_body_parts'] = False
-		clpDict['_ddd_points'] = False
-		clpDict['_loCoords'] = False
 
 	# ----------------------------------------------------------------------------------------------------------------------------------------------------------
 	# Global control parameters
@@ -953,8 +968,6 @@ def parseOpts( argv ):
 
 	if( args._verbose ):
 		clpDict['_verbose'] = args._verbose
-	else:
-		clpDict['_verbose'] = False
 
 	# ----------------------------------------------------------------------------------------------------------------------------------------------------------
 	# Print the configuration
@@ -970,10 +983,12 @@ def parseOpts( argv ):
 			print ("Pickle object path        : ", clpDict['_byte_object_path']  )
 		else:
 			print ("Pickle object path        : tmp_data/"  )
+	if( clpDict["_byte_object_name"] is not "data" ):
+		print("Byte object name           :", clpDict["_byte_object_name"] )
 	if( clpDict['_skeleton_name'] is not None ):
 		print ("Start with Set            : ", clpDict['_skeleton_name'] )
 	if( clpDict['_action_list'] is not None ):
-		print ("Action list            : ", clpDict['_action_list'] )
+		print ("Action list               : ", clpDict['_action_list'] )
 	if( clpDict['_subsampling'] is True):
 		print ("('Subsampling               : ', Activated ")
 		print ("Subsampling strategy      : ", str(clpDict['_sample_strategy']))
