@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# This scripts load all combinations for the 7 classes tests
+
+
+python hoj_gen.py -bo -bop 'tmp_data/7_classes_set/' -bon '7_classes_set/3d_points_global_7_classes' -3d -iT
+
+python hoj_gen.py -bo -bop 'tmp_data/7_classes_set/' -bon '7_classes_set/3d_points_local_7_classes' -3d -iT -loCoord
+
+python hoj_gen.py -bo -bop 'tmp_data/7_classes_set/' -bon '7_classes_set/hoj_7_classes' -hoj -iT 
+
+python hoj_gen.py -bo -bop 'tmp_data/7_classes_set/' -bon '7_classes_set/hoj_parts_7_classes' -hoj -iT -bP
+
+python hoj_gen.py -bo -bop 'tmp_data/7_classes_set/' -bon '7_classes_set/hoj_cylinder_7_classes' -hoj -iT -dM 'cylinder'
+
+python hoj_gen.py -bo -bop 'tmp_data/7_classes_set/' -bon '7_classes_set/hoj_cylinder_parts_7_classes' -hoj -iT -dM 'cylinder' -bP
+
+python hoj_gen.py -bo -bop 'tmp_data/7_classes_set/' -bon '7_classes_set/hoj_sphere_7_classes' -hoj -iT -dM 'sphere'
+
+python hoj_gen.py -bo -bop 'tmp_data/7_classes_set/' -bon '7_classes_set/hoj_sphere_parts_7_classes' -hoj -iT -dM 'sphere' -bP

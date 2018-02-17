@@ -1,0 +1,7 @@
+#!/bin/bash
+# This script builds the temp_data objects for the later tests following the NTU Paper 
+
+# 2 classes tmp data call --- Classes are: sitting down, standing up
+python hoj_gen.py -path '/data_2/testdata/externe_rgbd_datasets/Rose_LAB_NTU_Dataset/skeleton/' -iT -sub -aL 'A008,A009'
+mv tmp_data/data_part* 2_classes_set/
+mv tmp_data/name_name* 2_classes_set/
