@@ -7,10 +7,81 @@ import time
 import copy as cp
 import warnings
 
+from sklearn.metrics.pairwise import euclidean_distances
+
 # Ppe module import
 import frameHeader
 import joint
 
+#########################################################################################
+##
+##  Get the joint wise distance descriptor
+##
+#########################################################################################
+#def get_distance_descriptor(list_of_joints, reference_join, reference_join_up, reference_join_left, reference_join_right, joint_indexes = [], n_time = 0.0):
+def get_distance_descriptor(list_of_joints, joint_indexes = [], n_time = 0.0, local=False):
+	
+	t0 = time.time()
+
+	# get joints to compute
+	if(joint_indexes):
+		joints_to_compute = []
+		for index in joint_indexes:
+			joints_to_compute.append(cp.deepcopy(list_of_joints[index]))
+	else:
+		joints_to_compute = list_of_joints
+	
+	# Compute a local skeleton ( reference joint is the mid between hipl and hipr )
+	if local is True:
+		#translation
+		translation_vector = np.array([-reference_join.get_WorldJoint()[0], -reference_join.get_WorldJoint()[1], -reference_join.get_WorldJoint()[2]])
+
+		# print(translation_vector)
+
+		for joint in joints_to_compute:
+			point = np.array(joint.get_WorldJoint())
+			transformed_point = point + translation_vector
+			joint.set_WorldJoint(transformed_point.item(0),transformed_point.item(1),transformed_point.item(2))
+
+	# Compute output vector.
+	coords = np.zeros(len(joints_to_compute) * ( len(joints_to_compute) ) )
+	
+	# Compute joint to joint distance descriptor.
+	# Run through all joints
+	for idx_host,joint_host in enumerate(joints_to_compute):
+
+		host_vec = np.array(joint_host.get_WorldJoint())
+
+		# Compute for each joint ( except with itself ) a descriptor entry 
+		# containing euclidean distances to each other joint. ( TODO Later followed by an oriantation ??? )
+		# n joints x n-1 distances = ((n^2)-n) view independend entrys
+		guest_index = 0
+		for idx_guest,joint_guest in enumerate(joints_to_compute):
+
+			# # As long as host and guest are different entities.
+			# if idx_host != idx_guest:
+
+			guest_vec = np.array(joint_guest.get_WorldJoint())
+
+			# Compute euclidean between host and guest.
+			dist = np.linalg.norm( host_vec - guest_vec )
+
+			# Store joint to joint distance.
+			coords[idx_host * ( len(joints_to_compute) -1 ) + guest_index] = dist
+			guest_index = guest_index + 1 
+
+			# TODO Include local transformation later if necessary.
+			# x,y,z = transform_coordinate_linear(x_vector,y_vector,z_vector,joint.get_WorldJoint())
+		
+	
+
+
+
+
+	t1 = time.time()
+	n_time += t1 - t0
+	
+	return coords,n_time
 
 
 #########################################################################################
