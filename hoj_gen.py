@@ -64,6 +64,10 @@ def main():
 		_transformation_type = '_ddd_points'
 		# Set the desciptor width to the number of used joints multiplied by 3 ( the number of world coordinates )
 		_number_of_bins = 3 * len(clpDict['_joint_index_list'])
+	elif( clpDict['_dist'] is True ):
+		_transformation_type = '_dist'
+		# Set the desciptor width to the number of used joints multiplied by n ( the euclidean joint to joint distances )
+		_number_of_bins = len(clpDict['_joint_index_list']) * ( len(clpDict['_joint_index_list']) )
 	else:
 		# If you just want to subsample the dataset by action or camera or stuff		
 		_number_of_bins = 0
@@ -343,6 +347,8 @@ def compute_hoj_using_the_data_parts(
 	# Step trough the sets of this data part.
 	for _set in _data_part[0]:
 	
+		time = -1
+
 		# Create a hoj_set with the correct size ( number_of_set_files x descriptor length )
 		_set_of_hojes = np.zeros( ( len(_set), _number_of_bins_ ) )
 		_set_of_hojes_index = 0
@@ -396,7 +402,13 @@ def compute_hoj_using_the_data_parts(
 						list_of_joints[12],\
 						joint_indexes=_joint_index_list,\
 						n_time=0.0,\
-						local=_loCoords)		
+						local=_loCoords)
+				elif( _transformation_type is '_dist' ):
+					hoj3d_frame,time = _hoj_transformation.get_distance_descriptor(\
+						list_of_joints,\
+						joint_indexes=_joint_index_list,\
+						n_time=0.0,\
+						local=_loCoords)
 			
 				# If the computation of the hoj returns a -1 for time ( Error :: Division by Zero ) then use strategy to skip frame or set.
 				if( time is -1 ):
@@ -723,13 +735,15 @@ def store_pickles( _data, _name, _type='tmp', _part='0' ):
 		path='pickles/'
 		f_name = _name
 
-	if( os.path.exists(path) is False ):
-		os.makedirs(path)
+	# if( os.path.exists(path) is False ):
+	# 	os.makedirs(path)
 
 	if( _type is 'tmp' ):
 		store_data_path=str(path)+str(f_name)+".bin_data"+"_tmp"
 	elif( _type is 'final' ):
 		store_data_path=str(path)+str(f_name)+".bin_data"
+
+	check_Path(store_data_path)
 
 	with open(store_data_path, 'wb') as f:
 		pickle.dump(_data, f, protocol=2)
@@ -763,6 +777,13 @@ def load_pickles( _path, _part ):
 	return _data, _dir_counter
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
+# Check if path exist
+
+def check_Path( _path ):
+	if not os.path.exists(os.path.dirname( _path )):
+		os.makedirs(os.path.dirname( _path ))
+
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Parse the command line arguments
 def parseOpts( argv ):
@@ -786,6 +807,7 @@ def parseOpts( argv ):
 	_compute_descriptor = False
 	_hoj = False
 	_ddd_points = False
+	_dist = False
 	_loCoords = False  
 	_depth_measurement = None
 	_body_parts = False
@@ -813,6 +835,7 @@ def parseOpts( argv ):
 		'_compute_descriptor':_compute_descriptor,\
 		'_hoj':_hoj,\
 		'_ddd_points':_ddd_points,\
+		'_dist':_dist,\
 		'_loCoords':_loCoords,\
 		'_depth_measurement':_depth_measurement,\
 		'_body_parts':_body_parts,\
@@ -842,6 +865,7 @@ def parseOpts( argv ):
 	# Output Control
 	parser.add_argument('-3d', '--3d_points', action='store_true', dest='_ddd_points', help='If this is set to true, the output will be in the form of 3d points in the local skeleton coordinate system.')
 	parser.add_argument('-hoj', '--hoj', action='store_true', dest='_hoj', help='If this is set to true, the output will be in the form of a histogram of oriented joints ( using the sphere and parts extention ).')
+	parser.add_argument('-dist', '--distances', action='store_true', dest='_dist', help='If this is set to true, the output will be in the form of a joint to joint distance descriptor ( see README.md ).')
 	# TODO: Readme eintrag für das depth_measurment und die body parts schreiben.
 	parser.add_argument('-dM', '--depth_measurement', action='store', dest='_depth_measurement', help='Do you want to use the original hoj ( None ) or a hoj with a second layer ( cylinder | sphere )? [ None (default) | cylinder | sphere ]. See the Readme for further information.')
 	parser.add_argument('-bP', '--body_parts', action='store_true', dest='_body_parts', help='Do you want to compute body part correlations? [ False ( default ) | True ]. See the Readme for further information.')
@@ -902,9 +926,17 @@ def parseOpts( argv ):
 		clpDict['_joint_index_list'] = joint_index_list_
 	else:
 		# Used joints in the paper: 3, 5, 9, 6, 10, 13, 17, 14, 18, 12, 16
-		# head 0 | l elbow	1 | r elbow	2 | l hand 	3 | r hand 	4 | l knee 	5 | r knee 	6 | l feet 	7 | r feet 	8
+		
+		# TODO The following list is wrong and maybe the reason why the tests are so bad. 
+		# joint [list, skeleton ] | neck [0,3] | left shoulder [1,5] | right shoulder [2,9] | left elbow [3,6] | right elbow [4,10] | left hip	[5,13 | right hip [6,17] | left knee [7,14] | right knee [8,18]
+		#clpDict['_joint_index_list'] = [3, 5, 9, 6, 10, 13, 17, 14, 18]
+	
+		# FIX FIX FIX FIX FIX FIX 
+
+		# TODO Read paper -> fix joints ( Hoj Paper: http://cvrc.ece.utexas.edu/Publications/Xia_HAU3D12.pdf , page 3 right side bottom )
+		# joint [list, skeleton ] | base of spine [0,1] | left shoulder [1,5] | right shoulder [2,9] | left hand [3,8] | right hand [4,12] | left hip [5,13 | right hip [6,17] | left ankle [7,15] | right ankle [8,19]
 		# Aktuelle Joint List ohne hips
-		clpDict['_joint_index_list'] = [3, 5, 9, 6, 10, 13, 17, 14, 18]
+		clpDict['_joint_index_list'] = [1, 5, 9, 8, 12, 13, 17, 15, 19]
 
 	# Because of the main memory limitation it is recommended to only extract the joint data you need. ( world coordinates, depth values, color values, or color)
 	if( args._extraction_field ):
@@ -955,12 +987,21 @@ def parseOpts( argv ):
 			clpDict['_body_parts'] = True
 
 		clpDict['_ddd_points'] = False
+		clpDict['_dist'] = False
 	elif( args._ddd_points is True ):
 		clpDict['_compute_descriptor'] = True
 		clpDict['_hoj'] = False
 		clpDict['_ddd_points'] = True
+
 		if( args._loCoords ):
 			clpDict['_loCoords'] = True
+
+		clpDict['_dist'] = False
+	elif( args._dist is True ):
+		clpDict['_compute_descriptor'] = True
+		clpDict['_hoj'] = False
+		clpDict['_ddd_points'] = False
+		clpDict['_dist'] = True
 
 	# ----------------------------------------------------------------------------------------------------------------------------------------------------------
 	# Global control parameters
@@ -1027,6 +1068,9 @@ def parseOpts( argv ):
 		print ("Computation Output        : ", _cOPt)
 		clpDict['_hoj_conf_string'] = _cOPt
 
+	if( clpDict['_dist'] is True ):
+		_cOPt = "J2J_Distance Descriptor" 
+		print ("Computation Output        : ", _cOPt)
 	if clpDict['_remove_tmp_data_objects']:
 		print ("Remove temp data objects? : ", clpDict['_remove_tmp_data_objects'] )
 	print ("verbose                   : ", clpDict['_verbose'] )
